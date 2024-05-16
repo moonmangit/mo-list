@@ -1,0 +1,22 @@
+@layer utilities {
+  /* Small */
+  .block-sm {
+    @apply block sm:hidden;
+  }
+  .flex-sm {
+    @apply flex sm:hidden;
+  }
+  .iblock-sm {
+    @apply inline-block sm:hidden;
+  }
+  /* Large */
+  .block-lg {
+    @apply hidden lg:block;
+  }
+  .flex-lg {
+    @apply hidden lg:flex;
+  }
+  .iblock-lg {
+    @apply hidden lg:inline-block;
+  }
+}
