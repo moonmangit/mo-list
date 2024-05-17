@@ -9,7 +9,7 @@
     <slot></slot>
     <section
       v-if="error"
-      class="label text-error"
+      class="label !text-error"
     >
       <AppContentWithIcon
         :content="error"
@@ -34,6 +34,6 @@ export type { Props as AppInputGroupProps };
 
 <style scoped>
 section.label {
-  @apply text-neutral/70 text-sm;
+  @apply text-sm text-neutral/70;
 }
 </style>

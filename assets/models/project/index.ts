@@ -1,5 +1,7 @@
+import { doc, runTransaction } from "firebase/firestore";
 import { object, string, type InferType } from "yup";
 import { createBaseRecord, type BaseRecord } from "~/assets/libs/model";
+import type { UserDoc } from "~/assets/libs/user";
 
 // Saved
 type Saved = {
@@ -29,7 +31,17 @@ function savedToGot(saved: Saved, bypass?: Partial<Got>): Got {
 
 // Model
 const model = {
-  create() {},
+  async create(got: Got) {
+    const { db } = useNuxtApp().$fb;
+    const toSaved = gotToSaved(got);
+    // Write doc
+    await runTransaction(db, async (tsc) => {
+      const userDocRef = doc(db, `users/${useAuthStore().$state.data?.uid}`);
+      const userDoc = (await tsc.get(userDocRef)).data() as UserDoc;
+      userDoc.projects.push(toSaved);
+      tsc.set(userDocRef, userDoc);
+    });
+  },
   update() {},
   delete() {},
 };

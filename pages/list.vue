@@ -1,13 +1,36 @@
 <template>
   <div>
+    <section>
+      <ul class="space-y-3">
+        <li
+          v-for="i in 10"
+          :key="i"
+          class="flex gap-x-4 rounded-xl bg-white p-4"
+        >
+          <input
+            type="radio"
+            name="fav_language"
+            value="HTML"
+          />
+          <section>
+            <h1>Todo title</h1>
+            <p class="text-xs">Lorem ipsum dolor sit amet.</p>
+          </section>
+          <section></section>
+        </li>
+      </ul>
+    </section>
     <PartPageListToolsBar
       :query="query"
       @change-view="changeView($event)"
+      @after-submit="injected?.refresh()"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
+import type { Provide as LayoutDefaultProvide } from "~/layouts/default.vue";
+
 definePageMeta({
   validate({ query }) {
     const view = (query as any).view;
@@ -21,6 +44,8 @@ definePageMeta({
     return true;
   },
 });
+
+const injected = inject<LayoutDefaultProvide>("layout");
 
 // Query
 const route = useRoute();

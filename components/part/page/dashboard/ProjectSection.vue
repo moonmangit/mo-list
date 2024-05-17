@@ -14,23 +14,18 @@
       <div>
         <ul class="space-y-3">
           <li
-            v-for="project in ['E-commerce', 'Social Media', 'Shopping']"
-            :key="project"
+            v-for="project in projects"
+            :key="project.id"
           >
             <button
               class="project-card group"
-              @click.prevent="navigateTo(`/list?project=${project}`)"
+              @click.prevent="navigateTo(`/list?project=${project.id}`)"
             >
               <AppContentWithIcon
-                :content="`${randomIn(['mdi:abacus', 'mdi:access-point', 'mdi:ab-testing'])}|${project}|mdi:chevron-right`"
+                :content="`mdi:projector-screen|${project.name}|mdi:chevron-right`"
                 class="gap-x-4"
                 :classes="[
-                  randomIn([
-                    'text-red-500',
-                    'text-amber-500',
-                    'text-emerald-500',
-                    'text-blue-500',
-                  ]),
+                  'text-blue-500',
                   '',
                   'ml-auto group-hover:translate-x-2 duration-300',
                 ]"
@@ -46,15 +41,19 @@
       v-model="active"
       :after-close="() => {}"
     >
-      <form class="flex items-center gap-x-2">
+      <form
+        class="flex items-center gap-x-2"
+        @submit.prevent="submit"
+      >
         <input
+          v-model="form.defineField('name')[0].value"
           type="text"
           class="h-full w-full flex-1 py-5 text-xl outline-none"
           placeholder="Project name ..."
         />
         <button
           class="block aspect-square size-14 rounded-full bg-primary text-xl text-white"
-          @click="active = false"
+          type="submit"
         >
           <Icon name="solar:map-arrow-right-bold"></Icon>
         </button>
@@ -64,7 +63,31 @@
 </template>
 
 <script lang="ts" setup>
+import type { UserDoc } from "~/assets/libs/user";
+import { projectGotSchema, projectModel } from "~/assets/models/project";
+
+defineProps<{
+  projects: UserDoc["projects"];
+}>();
+
+const emits = defineEmits<{
+  (e: "after-submit"): void;
+}>();
+
+const form = useForm({
+  validationSchema: toTypedSchema(projectGotSchema),
+  initialValues: {
+    name: "",
+  },
+});
 const active = ref(false);
+
+const submit = form.handleSubmit(async (values, { resetForm }) => {
+  await projectModel.create(values);
+  emits("after-submit");
+  active.value = false;
+  resetForm();
+});
 </script>
 
 <style></style>

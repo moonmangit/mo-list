@@ -8,11 +8,11 @@ type UserDoc = {
   todos: TodoSaved[];
 };
 
-const DefaultUserDoc: UserDoc = {
+const defaultUserDoc: UserDoc = {
   projects: [],
   labels: [],
   todos: [],
 };
 
-export { DefaultUserDoc };
+export { defaultUserDoc };
 export type { UserDoc };

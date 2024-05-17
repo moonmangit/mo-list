@@ -5,42 +5,49 @@
         <div class="relative flex flex-col items-center p-2">
           <Icon
             name="solar:chat-square-check-bold"
-            class="text-primary text-8xl"
+            class="text-8xl text-primary"
           />
         </div>
         <h1 class="font-bold capitalize">welcome back !</h1>
       </section>
       <form
         class="flex w-[min(300px,90dvw)] flex-col gap-3"
-        @submit.prevent=""
+        @submit.prevent="submit()"
       >
         <AppInputText
-          v-model="email"
+          v-model="form.defineField('email')[0].value!"
           title="Email"
           type="email"
           placeholder="Email"
           class="input input-primary"
+          :error="form.errors.value.email"
         />
         <AppInputText
-          v-model="email"
+          v-model="form.defineField('password')[0].value!"
           title="Password"
           type="password"
           placeholder="Password"
           class="input input-primary"
+          :error="form.errors.value.password"
         />
+        <section class="mt-4 px-5">
+          <AppButton
+            class="btn-primary btn-block rounded-full"
+            content="Log in"
+            type="submit"
+          />
+        </section>
       </form>
-      <section class="px-5">
-        <AppButton
-          class="btn-primary btn-block rounded-full"
-          content="Log in"
-        />
-      </section>
       <p>or Log in with</p>
       <section class="space-x-5">
         <button class="text-4xl">
           <Icon name="logos:facebook"></Icon>
         </button>
-        <button class="text-4xl">
+        <button
+          class="text-4xl"
+          type="button"
+          @click.prevent="withGoogle()"
+        >
           <Icon name="logos:google-icon"></Icon>
         </button>
         <button class="text-4xl">
@@ -60,11 +67,34 @@
 </template>
 
 <script lang="ts" setup>
+import { object, string } from "yup";
+
 definePageMeta({
   layout: false,
 });
 
-const email = ref("");
+const form = useForm({
+  validationSchema: toTypedSchema(
+    object({
+      email: string().email().required(),
+      password: string().required(),
+    }),
+  ),
+  initialValues: {
+    email: "",
+    password: "",
+  },
+});
+const submit = form.handleSubmit(async (values) => {
+  try {
+    await useAuthStore().logInWithEmailPassword(values.email, values.password);
+  } catch (error: any) {
+    alert(error.message);
+  }
+});
+async function withGoogle() {
+  await useAuthStore().logInWithGoogle();
+}
 </script>
 
 <style></style>

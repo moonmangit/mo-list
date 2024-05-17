@@ -5,7 +5,7 @@
         <div class="relative flex flex-col items-center p-2">
           <Icon
             name="solar:chat-square-check-bold"
-            class="text-primary text-8xl"
+            class="text-8xl text-primary"
           />
         </div>
         <h1 class="font-bold capitalize">Let's get started !</h1>
@@ -28,13 +28,13 @@
           placeholder="Password"
           class="input input-primary"
         />
+        <section class="mt-4 px-5">
+          <AppButton
+            class="btn-primary btn-block rounded-full"
+            content="Sign up"
+          />
+        </section>
       </form>
-      <section class="px-5">
-        <AppButton
-          class="btn-primary btn-block rounded-full"
-          content="Sign up"
-        />
-      </section>
       <p>or Log in with</p>
       <section class="space-x-5">
         <button class="text-4xl">

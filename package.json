@@ -9,11 +9,13 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint --ext .js,.vue,.ts,.tsx --ignore-path .eslintignore .",
-    "pret:fix": "prettier . --write"
+    "pret:fix": "prettier . --write",
+    "firebase:start": "firebase emulators:start"
   },
   "dependencies": {
     "@nuxtjs/google-fonts": "^3.2.0",
     "@pinia/nuxt": "^0.5.1",
+    "@popperjs/core": "^2.11.8",
     "@vee-validate/nuxt": "^4.12.8",
     "@vee-validate/yup": "^4.12.8",
     "@vueuse/nuxt": "^10.9.0",
@@ -21,6 +23,7 @@
     "firebase": "^10.12.0",
     "nuxt": "^3.11.2",
     "nuxt-icon": "^0.6.10",
+    "v-calendar": "^3.1.2",
     "vue": "^3.4.27",
     "vue-router": "^4.3.2",
     "yup": "^1.4.0"

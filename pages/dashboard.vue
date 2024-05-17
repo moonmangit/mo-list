@@ -17,16 +17,26 @@
         @click.prevent="navigateTo('/list?view=priority')"
       />
     </section>
-    <PartPageDashboardProjectSection />
-    <PartPageDashboardLabelSection />
+    <PartPageDashboardProjectSection
+      :projects="injected.data.value?.projects || []"
+      @after-submit="injected.refresh()"
+    />
+    <PartPageDashboardLabelSection
+      :labels="injected.data.value?.labels || []"
+      @after-submit="injected.refresh()"
+    />
     <PartPageDashboardStatusSection />
   </div>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import type { Provide as LayoutDefaultProvide } from "~/layouts/default.vue";
+
+const injected = inject<LayoutDefaultProvide>("layout")!;
+</script>
 
 <style scoped>
 .this:deep(.project-card) {
-  @apply w-full rounded-xl border bg-white p-5 px-7 text-lg duration-300 hover:-translate-y-1;
+  @apply w-full rounded-xl border bg-white p-5 px-7 text-lg duration-300;
 }
 </style>

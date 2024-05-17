@@ -1,4 +1,5 @@
 @import "./_display.css";
+@import "/node_modules/v-calendar/dist/style.css";
 
 @tailwind base;
 @tailwind components;

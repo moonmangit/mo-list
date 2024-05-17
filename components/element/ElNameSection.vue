@@ -7,14 +7,15 @@
           v-for="(act, actKey) in actions"
           :key="actKey"
           :content="(act as any).icon"
-          class="btn-ghost btn-circle text-2xl"
+          class="btn-circle btn-ghost text-2xl"
           @click.prevent="(act as any).action()"
         />
         <AppButton
-          class="btn-ghost btn-circle rotate-180 text-2xl duration-300"
+          class="btn-circle btn-ghost text-2xl duration-300"
           content="mdi:chevron-down"
           :class="{
-            'rotate-0 transform': !collapse,
+            'rotate-180': collapse,
+            'rotate-0': !collapse,
           }"
           @click.prevent="collapse = !collapse"
         ></AppButton>

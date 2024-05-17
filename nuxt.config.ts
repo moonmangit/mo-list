@@ -1,6 +1,18 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: false,
+  runtimeConfig: {
+    public: {
+      firebase: {
+        apiKey: "",
+        authDomain: "",
+        projectId: "",
+        storageBucket: "",
+        messagingSenderId: "",
+        appId: "",
+      },
+    },
+  },
   components: [
     {
       path: "~/components/app",
