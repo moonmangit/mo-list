@@ -43,7 +43,28 @@ const model = {
     });
   },
   update() {},
-  delete() {},
+  async delete(saved: Saved) {
+    const { db } = useNuxtApp().$fb;
+    // Write doc
+    await runTransaction(db, async (tsc) => {
+      const userDocRef = doc(db, `users/${useAuthStore().$state.data?.uid}`);
+      const userDoc = (await tsc.get(userDocRef)).data() as UserDoc;
+      const labelIndex = userDoc.labels.findIndex((p) => p.id === saved.id);
+      if (labelIndex === -1) {
+        throw new Error("Label not found");
+      }
+      // Delete label-key from todos
+      userDoc.todos.map((t) => {
+        return {
+          ...t,
+          labelIds: t.labelIds.filter((l) => l !== saved.id),
+        };
+      });
+      // Delete label
+      userDoc.labels.splice(labelIndex, 1);
+      tsc.set(userDocRef, userDoc);
+    });
+  },
 };
 
 export {

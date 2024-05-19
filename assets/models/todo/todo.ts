@@ -2,6 +2,7 @@ import { doc, runTransaction } from "firebase/firestore";
 import { array, object, string, type InferType } from "yup";
 import { createBaseRecord, type BaseRecord } from "~/assets/libs/model";
 import type { UserDoc } from "~/assets/libs/user";
+import type { UpdateJob } from "~/components/part/page/list/ToolsBar.vue";
 
 // Saved
 type Saved = {
@@ -9,6 +10,7 @@ type Saved = {
   projectId: string;
   dueDate: string;
   labelIds: string[];
+  status: "todo" | "doing" | "done";
 } & BaseRecord;
 
 // Got
@@ -27,6 +29,7 @@ function gotToSaved(got: Got, bypass?: Partial<Saved>): Saved {
     dueDate: got.dueDate || "",
     projectId: got.projectId || "",
     name: got.name,
+    status: "todo",
     ...createBaseRecord(),
     ...bypass,
   };
@@ -54,8 +57,36 @@ const model = {
       tsc.set(userDocRef, userDoc);
     });
   },
-  update() {},
-  delete() {},
+  async updateStatus(jobs: UpdateJob[]) {
+    const { db } = useNuxtApp().$fb;
+    await runTransaction(db, async (tsc) => {
+      const userDocRef = doc(db, `users/${useAuthStore().$state.data?.uid}`);
+      const userDoc = (await tsc.get(userDocRef)).data() as UserDoc;
+      const todos = userDoc.todos;
+      jobs.forEach((job) => {
+        const todo = todos.find((todo) => todo.id === job.tid);
+        if (todo) todo.status = job.to;
+      });
+      tsc.set(userDocRef, userDoc);
+    });
+  },
+  async clear(projectId?: string) {
+    // if projectId is undefined, clear 'done' in all projects
+    const { db } = useNuxtApp().$fb;
+    await runTransaction(db, async (tsc) => {
+      const userDocRef = doc(db, `users/${useAuthStore().$state.data?.uid}`);
+      const userDoc = (await tsc.get(userDocRef)).data() as UserDoc;
+      const todos = userDoc.todos;
+      userDoc.todos = todos.filter((todo) => {
+        if (projectId) {
+          return todo.projectId !== projectId || todo.status !== "done";
+        } else {
+          return todo.status !== "done";
+        }
+      });
+      tsc.set(userDocRef, userDoc);
+    });
+  },
 };
 
 export {

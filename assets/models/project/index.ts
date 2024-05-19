@@ -43,7 +43,25 @@ const model = {
     });
   },
   update() {},
-  delete() {},
+  async delete(saved: Saved) {
+    const { db } = useNuxtApp().$fb;
+    // Write doc
+    await runTransaction(db, async (tsc) => {
+      const userDocRef = doc(db, `users/${useAuthStore().$state.data?.uid}`);
+      const userDoc = (await tsc.get(userDocRef)).data() as UserDoc;
+      const projectIndex = userDoc.projects.findIndex((p) => p.id === saved.id);
+      if (projectIndex === -1) {
+        throw new Error("Project not found");
+      }
+      // Delete todo that belongs to this project
+      userDoc.todos = userDoc.todos.filter(
+        (todo) => todo.projectId !== saved.id,
+      );
+      // Delete project
+      userDoc.projects.splice(projectIndex, 1);
+      tsc.set(userDocRef, userDoc);
+    });
+  },
 };
 
 export {

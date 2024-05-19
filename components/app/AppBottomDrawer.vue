@@ -7,7 +7,7 @@
     }"
   >
     <div
-      class="fixed inset-x-0 bottom-0 max-h-[90dvh] overflow-y-auto rounded-b-none rounded-t-2xl bg-white p-8 duration-300 md:inset-x-auto md:bottom-auto md:w-[min(600px,90dvw)] md:rounded-b-2xl"
+      class="fixed inset-x-0 bottom-0 rounded-b-none rounded-t-2xl bg-white p-8 duration-300 md:inset-x-auto md:bottom-auto md:w-[min(600px,90dvw)] md:rounded-b-2xl"
       :class="{
         'translate-y-0 delay-300 md:opacity-100': modelValue,
         'translate-y-full md:translate-y-5 md:opacity-0 ': !modelValue,

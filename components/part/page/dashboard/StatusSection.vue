@@ -4,7 +4,7 @@
       <div>
         <ul class="flex flex-col gap-3">
           <li
-            v-for="status in ['todo', 'doing', 'done']"
+            v-for="(config, status) in statusConfig"
             :key="status"
             class="h-full"
           >
@@ -13,14 +13,10 @@
               @click.prevent="navigateTo(`/list?status=${status}`)"
             >
               <AppContentWithIcon
-                :content="`mdi:circle|${status}|mdi:chevron-right`"
+                :content="`mdi:circle|${config.label}|mdi:chevron-right`"
                 class="gap-x-4"
                 :classes="[
-                  randomIn([
-                    'text-red-500',
-                    'text-emerald-500',
-                    'text-blue-500',
-                  ]),
+                  config.colorClass,
                   '',
                   'ml-auto group-hover:translate-x-2 duration-300',
                 ]"
@@ -33,6 +29,28 @@
   </div>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+type Status = "todo" | "doing" | "done";
+const statusConfig: Record<
+  Status,
+  {
+    label: string;
+    colorClass: string;
+  }
+> = {
+  todo: {
+    label: "To Do",
+    colorClass: "text-red-500",
+  },
+  doing: {
+    label: "Doing",
+    colorClass: "text-emerald-500",
+  },
+  done: {
+    label: "Done",
+    colorClass: "text-blue-500",
+  },
+};
+</script>
 
 <style></style>

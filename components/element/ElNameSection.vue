@@ -1,5 +1,5 @@
 <template>
-  <section class="mb-4">
+  <section class="mb-4 block">
     <div class="flex items-center justify-between">
       <section class="text-lg font-bold">{{ title }}</section>
       <section class="space-x-2">
@@ -11,6 +11,7 @@
           @click.prevent="(act as any).action()"
         />
         <AppButton
+          v-if="!alwaysOpen"
           class="btn-circle btn-ghost text-2xl duration-300"
           content="mdi:chevron-down"
           :class="{
@@ -22,10 +23,11 @@
       </section>
     </div>
     <div
+      v-if="!hideContent"
       class="overflow-hidden duration-500"
       :class="{
-        'max-h-0 py-0': collapse,
-        'max-h-[500px] py-4 pt-2': !collapse,
+        'max-h-0 py-0': collapse && !alwaysOpen,
+        'max-h-[500px] py-4 pt-2': !collapse || alwaysOpen,
       }"
     >
       <slot></slot>
@@ -43,6 +45,8 @@ defineProps<{
       action: () => void;
     }
   >;
+  alwaysOpen?: boolean;
+  hideContent?: boolean;
 }>();
 
 const collapse = ref(false);

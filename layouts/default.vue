@@ -5,10 +5,13 @@
       class="sticky top-0 z-20 space-y-2 bg-primary p-4 text-primary-content"
     >
       <div class="mx-auto flex max-w-[500px] justify-between">
-        <!-- on List -->
+        <!-- on List Page -->
         <template v-if="$route.path !== '/dashboard'">
           <button
             class="duration-2 group z-10 space-x-2 rounded-full bg-white/60 p-2 px-4 text-primary-content duration-300 hover:bg-white"
+            :class="{
+              'pointer-events-none opacity-0': disabledBackToDashboard,
+            }"
             @click="navigateTo('/dashboard')"
           >
             <Icon
@@ -21,16 +24,32 @@
               class="text-2xl"
             />
           </button>
-          <button
-            class="w-fit rounded-full bg-white/50 p-2 text-primary-content duration-300 hover:bg-white/100"
-          >
-            <Icon
-              name="eva:more-horizontal-fill"
-              class="text-2xl"
-            />
-          </button>
+          <section class="space-x-4">
+            <button
+              v-if="$route.query.project || $route.query.label"
+              class="relative z-10 w-fit rounded-full bg-white/50 p-2 text-primary-content duration-300 hover:bg-white/100"
+              @click.prevent="deleteTag()"
+            >
+              <Icon
+                name="solar:trash-bin-2-bold-duotone"
+                class="text-2xl"
+              />
+            </button>
+            <button
+              class="relative z-10 w-fit rounded-full bg-white/50 p-2 text-primary-content duration-300 hover:bg-white/100"
+              :class="{
+                'pointer-events-none opacity-0': disabledBackToDashboard,
+              }"
+              @click.prevent="clearDoneTodos()"
+            >
+              <Icon
+                name="solar:broom-bold-duotone"
+                class="text-2xl"
+              />
+            </button>
+          </section>
         </template>
-        <!-- on Dashboard -->
+        <!-- on Dashboard Page -->
         <template v-else>
           <button
             class="relative"
@@ -114,9 +133,22 @@
           </button>
         </template>
       </div>
-      <div class="relative mx-auto max-w-[500px]">
-        <p class="text-sm text-primary-content/70">Sunday, 1 Mar 24</p>
-        <h1 class="text-xl capitalize text-white">{{ pageTitle }}</h1>
+      <div
+        class="relative mx-auto flex max-w-[500px] items-center justify-between"
+      >
+        <section>
+          <p class="text-sm text-primary-content/70">
+            {{
+              new Date().toLocaleDateString("en-US", {
+                weekday: "long",
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })
+            }}
+          </p>
+          <h1 class="text-xl capitalize text-white">{{ pageTitle }}</h1>
+        </section>
       </div>
       <div class="absolute inset-0 !mt-0 overflow-hidden">
         <div class="absolute inset-0 mx-auto max-w-[500px]">
@@ -136,8 +168,11 @@
 <script lang="ts" setup>
 import { doc, getDoc } from "firebase/firestore";
 import type { UserDoc } from "~/assets/libs/user";
+import { labelModel } from "~/assets/models/label";
+import { projectModel } from "~/assets/models/project";
+import { todoModel } from "~/assets/models/todo/todo";
 
-const { data, refresh } = useAsyncData<UserDoc>(async () => {
+const { data, refresh } = useAsyncData<UserDoc>("userdata", async () => {
   const _data = (
     await getDoc(
       doc(useNuxtApp().$fb.db, `users/${useAuthStore().$state.data?.uid}`),
@@ -146,15 +181,46 @@ const { data, refresh } = useAsyncData<UserDoc>(async () => {
 
   return _data;
 });
+const disabledBackToDashboard = ref(false);
 type Provide = {
   refresh: typeof refresh;
   data: typeof data;
+  disabledBackToDashboard: typeof disabledBackToDashboard;
 };
 provide<Provide>("layout", {
   refresh,
   data,
+  disabledBackToDashboard,
 });
 export type { Provide };
+
+// Delete
+async function deleteTag() {
+  if (!confirm("Are you sure you want to delete this?")) return;
+  const { project, label } = useRoute().query;
+  if (project) {
+    const toDeleteProject = data.value?.projects.find((p) => p.id === project);
+    if (toDeleteProject) {
+      await projectModel.delete(toDeleteProject);
+    }
+    await refresh();
+    navigateTo("/dashboard");
+  } else if (label) {
+    const toDeleteLabel = data.value?.labels.find((l) => l.id === label);
+    if (toDeleteLabel) {
+      await labelModel.delete(toDeleteLabel);
+    }
+    await refresh();
+    navigateTo("/dashboard");
+  }
+}
+
+// Clear
+async function clearDoneTodos() {
+  const project = useRoute().query.project as string | undefined;
+  await todoModel.clear(project);
+  await refresh();
+}
 
 // Profile menu
 const profileMenuActive = ref(false);
