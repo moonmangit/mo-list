@@ -10,6 +10,7 @@
           },
         },
       }"
+      :always-open="labels.length === 0"
     >
       <div>
         <ul class="space-y-3">
@@ -31,6 +32,12 @@
                 ]"
               />
             </button>
+          </li>
+          <li
+            v-if="labels.length === 0"
+            class="text-center text-neutral-400"
+          >
+            No label created yet.
           </li>
         </ul>
       </div>

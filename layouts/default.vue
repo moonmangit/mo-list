@@ -24,7 +24,12 @@
               class="text-2xl"
             />
           </button>
-          <section class="space-x-4">
+          <section
+            class="space-x-4 duration-300"
+            :class="{
+              'space-x-0': disabledBackToDashboard,
+            }"
+          >
             <button
               v-if="$route.query.project || $route.query.label"
               class="relative z-10 w-fit rounded-full bg-white/50 p-2 text-primary-content duration-300 hover:bg-white/100"
@@ -38,7 +43,8 @@
             <button
               class="relative z-10 w-fit rounded-full bg-white/50 p-2 text-primary-content duration-300 hover:bg-white/100"
               :class="{
-                'pointer-events-none opacity-0': disabledBackToDashboard,
+                'pointer-events-none max-w-0 overflow-hidden px-0 opacity-0':
+                  disabledBackToDashboard,
               }"
               @click.prevent="clearDoneTodos()"
             >
@@ -50,90 +56,80 @@
           </section>
         </template>
         <!-- on Dashboard Page -->
-        <template v-else>
-          <button
-            class="relative"
-            @click="openProfileMenu()"
-          >
-            <!-- Profile -->
-            <section
-              v-if="!useAuthStore().$state.data?.photoURL"
-              class="relative z-[999] w-fit rounded-full p-2 text-primary-content duration-700"
-              :class="{
-                'bg-white': !profileMenuActive,
-                'bg-transparent': profileMenuActive,
-              }"
-            >
-              <Icon
-                name="solar:user-bold-duotone"
-                class="text-2xl"
-              />
-            </section>
-            <div
-              v-else
-              class="relative z-[999]"
-            >
-              <img
-                :src="useAuthStore().$state.data?.photoURL || ''"
-                class="size-10 rounded-full object-cover"
-                alt=""
-              />
-              <span
-                class="absolute bottom-0 right-0 z-10 block size-3 rounded-full bg-error"
-              />
-            </div>
-            <!-- Profile Menu -->
-            <section
-              ref="profileMenuEl"
-              class="absolute -left-2 -top-2 z-[100] aspect-square max-h-[130px] rounded-[30px] bg-white duration-300"
-              :class="{
-                'w-[min(300px,calc(100dvw-2rem))] opacity-100':
-                  profileMenuActive,
-                'w-14 opacity-0': !profileMenuActive,
-              }"
-            >
-              <div
-                class="absolute left-14 right-0 top-0 flex h-14 flex-col items-start justify-center whitespace-nowrap text-left"
-              >
-                <h1 class="max-w-[20ch] truncate">
-                  {{ useAuthStore().$state.data?.displayName }}
-                </h1>
-                <p class="max-w-[25ch] truncate pr-3 text-xs text-neutral/50">
-                  {{ useAuthStore().$state.data?.email }}
-                </p>
-              </div>
-              <div
-                class="absolute inset-x-0 top-14 flex h-[calc(100%-3.5rem)] items-center justify-center px-5"
-              >
-                <AppButton
-                  content="Sign out|mdi:logout"
-                  class="btn-circle btn-ghost w-full duration-300"
-                  :class="{
-                    'opacity-0': !profileMenuActive,
-                    'opacity-100': profileMenuActive,
-                  }"
-                  @click.prevent="logout()"
-                />
-              </div>
-            </section>
-            <!-- Profile Menu Backdrop -->
-            <section
-              class="pointer-events-none fixed inset-0 z-[90] bg-black/70 shadow-2xl backdrop-blur-sm duration-300"
-              :class="{
-                'opacity-0': !profileMenuActive,
-                'opacity-100': profileMenuActive,
-              }"
-            ></section>
-          </button>
-          <button
-            class="w-fit rounded-full bg-white/50 p-2 text-primary-content duration-300 hover:bg-white/100"
+        <button
+          v-else
+          class="relative"
+          @click="openProfileMenu()"
+        >
+          <!-- Profile -->
+          <section
+            v-if="!useAuthStore().$state.data?.photoURL"
+            class="relative z-[999] w-fit rounded-full p-2 text-primary-content duration-700"
+            :class="{
+              'bg-white': !profileMenuActive,
+              'bg-transparent': profileMenuActive,
+            }"
           >
             <Icon
-              name="solar:asteroid-bold-duotone"
+              name="solar:user-bold-duotone"
               class="text-2xl"
             />
-          </button>
-        </template>
+          </section>
+          <div
+            v-else
+            class="relative z-[999]"
+          >
+            <img
+              :src="useAuthStore().$state.data?.photoURL || ''"
+              class="size-10 rounded-full object-cover"
+              alt=""
+            />
+            <span
+              class="absolute bottom-0 right-0 z-10 block size-3 rounded-full bg-error"
+            />
+          </div>
+          <!-- Profile Menu -->
+          <section
+            ref="profileMenuEl"
+            class="absolute -left-2 -top-2 z-[100] aspect-square max-h-[130px] rounded-[30px] bg-white duration-300"
+            :class="{
+              'w-[min(300px,calc(100dvw-2rem))] opacity-100': profileMenuActive,
+              'w-14 opacity-0': !profileMenuActive,
+            }"
+          >
+            <div
+              class="absolute left-14 right-0 top-0 flex h-14 flex-col items-start justify-center whitespace-nowrap text-left"
+            >
+              <h1 class="max-w-[20ch] truncate">
+                {{ useAuthStore().$state.data?.displayName }}
+              </h1>
+              <p class="max-w-[25ch] truncate pr-3 text-xs text-neutral/50">
+                {{ useAuthStore().$state.data?.email }}
+              </p>
+            </div>
+            <div
+              class="absolute inset-x-0 top-14 flex h-[calc(100%-3.5rem)] items-center justify-center px-5"
+            >
+              <AppButton
+                content="Sign out|mdi:logout"
+                class="btn-circle btn-ghost w-full duration-300"
+                :class="{
+                  'opacity-0': !profileMenuActive,
+                  'opacity-100': profileMenuActive,
+                }"
+                @click.prevent="logout()"
+              />
+            </div>
+          </section>
+          <!-- Profile Menu Backdrop -->
+          <section
+            class="pointer-events-none fixed inset-0 z-[90] bg-black/70 shadow-2xl backdrop-blur-sm duration-300"
+            :class="{
+              'opacity-0': !profileMenuActive,
+              'opacity-100': profileMenuActive,
+            }"
+          ></section>
+        </button>
       </div>
       <div
         class="relative mx-auto flex max-w-[500px] items-center justify-between"

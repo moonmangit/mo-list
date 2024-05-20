@@ -10,6 +10,7 @@
           },
         },
       }"
+      :always-open="projects.length === 0"
     >
       <div>
         <ul class="space-y-3">
@@ -31,6 +32,12 @@
                 ]"
               />
             </button>
+          </li>
+          <li
+            v-if="projects.length === 0"
+            class="text-center text-neutral-400"
+          >
+            No project created yet.
           </li>
         </ul>
       </div>

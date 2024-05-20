@@ -10,7 +10,8 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint --ext .js,.vue,.ts,.tsx --ignore-path .eslintignore .",
     "pret:fix": "prettier . --write",
-    "firebase:start": "firebase emulators:start"
+    "firebase:start": "firebase emulators:start",
+    "deploy": "nuxt build && nuxt generate && firebase deploy --only hosting"
   },
   "dependencies": {
     "@nuxtjs/google-fonts": "^3.2.0",
