@@ -84,10 +84,17 @@ const form = useForm({
 const active = ref(false);
 
 const submit = form.handleSubmit(async (values, { resetForm }) => {
-  await labelModel.create(values);
-  emits("after-submit");
-  active.value = false;
-  resetForm();
+  await callWith(
+    async () => {
+      await labelModel.create(values);
+      emits("after-submit");
+      active.value = false;
+      resetForm();
+    },
+    {
+      loading: true,
+    },
+  );
 });
 </script>
 

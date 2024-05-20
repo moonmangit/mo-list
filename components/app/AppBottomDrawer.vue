@@ -2,7 +2,7 @@
   <div
     class="fixed inset-0 z-30 !m-0 flex items-center justify-center duration-300"
     :class="{
-      'pointer-events-auto bg-black/30 backdrop-blur-sm ': modelValue,
+      'pointer-events-auto bg-black/70 backdrop-blur-sm ': modelValue,
       'pointer-events-none bg-transparent delay-300': !modelValue,
     }"
   >

@@ -4,8 +4,10 @@ import {
   createUserWithEmailAndPassword,
   type User,
   signOut,
+  FacebookAuthProvider,
 } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
+import { GithubAuthProvider } from "firebase/auth/cordova";
 
 type _User = Pick<User, "uid" | "email" | "displayName" | "photoURL">;
 
@@ -37,6 +39,17 @@ export const useAuthStore = defineStore("Auth", () => {
     provider.addScope("email");
     await signInWithPopup(useNuxtApp().$fb.auth, provider);
   }
+  async function logInWithFacebook() {
+    const provider = new FacebookAuthProvider();
+    provider.addScope("public_profile");
+    provider.addScope("email");
+    await signInWithPopup(useNuxtApp().$fb.auth, provider);
+  }
+  async function logInWithGithub() {
+    const provider = new GithubAuthProvider();
+    provider.addScope("repo");
+    await signInWithPopup(useNuxtApp().$fb.auth, provider);
+  }
   async function registerWithEmailPassword(email: string, password: string) {
     await createUserWithEmailAndPassword(
       useNuxtApp().$fb.auth,
@@ -55,6 +68,8 @@ export const useAuthStore = defineStore("Auth", () => {
     setUser,
     logInWithEmailPassword,
     logInWithGoogle,
+    logInWithGithub,
+    logInWithFacebook,
     registerWithEmailPassword,
     logout,
   };

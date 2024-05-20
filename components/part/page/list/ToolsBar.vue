@@ -225,15 +225,29 @@ const form = useForm({
   },
 });
 const submit = form.handleSubmit(async (values, { resetForm }) => {
-  await todoModel.create(values);
-  emits("afterSubmit");
-  resetForm();
-  active.value = false;
+  await callWith(
+    async () => {
+      await todoModel.create(values);
+      emits("afterSubmit");
+      resetForm();
+      active.value = false;
+    },
+    {
+      loading: true,
+    },
+  );
 });
 
 async function submitUpdate() {
-  await todoModel.updateStatus(props.updateJobs);
-  emits("afterUpdate");
+  await callWith(
+    async () => {
+      await todoModel.updateStatus(props.updateJobs);
+      emits("afterUpdate");
+    },
+    {
+      loading: true,
+    },
+  );
 }
 
 const todoPlaceholder = computed(() => {

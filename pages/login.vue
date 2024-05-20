@@ -40,7 +40,10 @@
       </form>
       <p>or Log in with</p>
       <section class="space-x-5">
-        <button class="text-4xl">
+        <button
+          class="text-4xl"
+          @click.prevent="withFacebook()"
+        >
           <Icon name="logos:facebook"></Icon>
         </button>
         <button
@@ -50,8 +53,12 @@
         >
           <Icon name="logos:google-icon"></Icon>
         </button>
-        <button class="text-4xl">
-          <Icon name="logos:apple"></Icon>
+        <button
+          class="text-4xl"
+          type="button"
+          @click.prevent="withGithub()"
+        >
+          <Icon name="logos:git-icon"></Icon>
         </button>
       </section>
       <p class="inline-block pt-8">
@@ -86,14 +93,47 @@ const form = useForm({
   },
 });
 const submit = form.handleSubmit(async (values) => {
-  try {
-    await useAuthStore().logInWithEmailPassword(values.email, values.password);
-  } catch (error: any) {
-    alert(error.message);
-  }
+  await callWith(
+    async () => {
+      await useAuthStore().logInWithEmailPassword(
+        values.email,
+        values.password,
+      );
+    },
+    {
+      loading: true,
+    },
+  );
 });
 async function withGoogle() {
-  await useAuthStore().logInWithGoogle();
+  await callWith(
+    async () => {
+      await useAuthStore().logInWithGoogle();
+    },
+    {
+      loading: true,
+    },
+  );
+}
+async function withFacebook() {
+  await callWith(
+    async () => {
+      await useAuthStore().logInWithFacebook();
+    },
+    {
+      loading: true,
+    },
+  );
+}
+async function withGithub() {
+  await callWith(
+    async () => {
+      await useAuthStore().logInWithGithub();
+    },
+    {
+      loading: true,
+    },
+  );
 }
 </script>
 

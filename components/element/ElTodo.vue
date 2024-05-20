@@ -63,4 +63,14 @@ const projectOfThisTodo = computed(() => {
 });
 </script>
 
-<style></style>
+<style scoped>
+.tag {
+  @apply whitespace-nowrap rounded-full px-2 text-sm;
+}
+.tag--project {
+  @apply bg-blue-500 text-white;
+}
+.tag--label {
+  @apply bg-amber-500 text-white;
+}
+</style>

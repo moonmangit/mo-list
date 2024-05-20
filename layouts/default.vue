@@ -95,8 +95,10 @@
               <div
                 class="absolute left-14 right-0 top-0 flex h-14 flex-col items-start justify-center whitespace-nowrap text-left"
               >
-                <h1>{{ useAuthStore().$state.data?.displayName }}</h1>
-                <p class="w-full truncate pr-3 text-xs text-neutral/50">
+                <h1 class="max-w-[20ch] truncate">
+                  {{ useAuthStore().$state.data?.displayName }}
+                </h1>
+                <p class="max-w-[25ch] truncate pr-3 text-xs text-neutral/50">
                   {{ useAuthStore().$state.data?.email }}
                 </p>
               </div>
@@ -116,7 +118,7 @@
             </section>
             <!-- Profile Menu Backdrop -->
             <section
-              class="pointer-events-none fixed inset-0 z-[90] bg-black/30 shadow-2xl backdrop-blur-sm duration-300"
+              class="pointer-events-none fixed inset-0 z-[90] bg-black/70 shadow-2xl backdrop-blur-sm duration-300"
               :class="{
                 'opacity-0': !profileMenuActive,
                 'opacity-100': profileMenuActive,
@@ -197,29 +199,46 @@ export type { Provide };
 // Delete
 async function deleteTag() {
   if (!confirm("Are you sure you want to delete this?")) return;
-  const { project, label } = useRoute().query;
-  if (project) {
-    const toDeleteProject = data.value?.projects.find((p) => p.id === project);
-    if (toDeleteProject) {
-      await projectModel.delete(toDeleteProject);
-    }
-    await refresh();
-    navigateTo("/dashboard");
-  } else if (label) {
-    const toDeleteLabel = data.value?.labels.find((l) => l.id === label);
-    if (toDeleteLabel) {
-      await labelModel.delete(toDeleteLabel);
-    }
-    await refresh();
-    navigateTo("/dashboard");
-  }
+  await callWith(
+    async () => {
+      const { project, label } = useRoute().query;
+      if (project) {
+        const toDeleteProject = data.value?.projects.find(
+          (p) => p.id === project,
+        );
+        if (toDeleteProject) {
+          await projectModel.delete(toDeleteProject);
+        }
+        await refresh();
+        navigateTo("/dashboard");
+      } else if (label) {
+        const toDeleteLabel = data.value?.labels.find((l) => l.id === label);
+        if (toDeleteLabel) {
+          await labelModel.delete(toDeleteLabel);
+        }
+        await refresh();
+        navigateTo("/dashboard");
+      }
+    },
+    {
+      loading: true,
+    },
+  );
 }
 
 // Clear
 async function clearDoneTodos() {
-  const project = useRoute().query.project as string | undefined;
-  await todoModel.clear(project);
-  await refresh();
+  if (!confirm("Are you sure you want to clear all done todos?")) return;
+  await callWith(
+    async () => {
+      const project = useRoute().query.project as string | undefined;
+      await todoModel.clear(project);
+      await refresh();
+    },
+    {
+      loading: true,
+    },
+  );
 }
 
 // Profile menu
@@ -235,7 +254,15 @@ function closeProfileMenu() {
 
 // Logout
 async function logout() {
-  await useAuthStore().logout();
+  await callWith(
+    async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await useAuthStore().logout();
+    },
+    {
+      loading: true,
+    },
+  );
 }
 
 // Page title

@@ -34,7 +34,59 @@
         </ul>
       </template>
       <!-- Calendar -->
-      <template v-else-if="query.view === 'calendar'"></template>
+      <template v-else-if="query.view === 'calendar'">
+        <div class="relative space-y-4 overflow-hidden">
+          <div>
+            <Calendar
+              color="primary"
+              :attributes="[
+                {
+                  highlight: {
+                    fillMode: 'light',
+                  },
+                  dates: [new Date()],
+                },
+                {
+                  highlight: {
+                    fillMode: 'solid',
+                  },
+                  dates: [calendarActiveDate],
+                },
+                {
+                  dot: 'red',
+                  dates: calendarContent.dots,
+                },
+              ]"
+              @dayclick="calendarChangeActiveDate($event.date)"
+            />
+          </div>
+          <hr class="mx-auto w-2/3" />
+          <TransitionGroup
+            name="list"
+            tag="ul"
+            class="space-y-3"
+          >
+            <li
+              v-for="todo in calendarActiveTodos"
+              :key="todo.id"
+            >
+              <ElTodo
+                :todo="todo"
+                :projects="injected?.data.value?.projects || []"
+                :labels="injected?.data.value?.labels || []"
+                @click="toggleTodoJob(todo.id)"
+              />
+            </li>
+            <li
+              v-if="calendarActiveTodos.length === 0"
+              key="empty"
+              class="text-center text-neutral-400"
+            >
+              No todo for selected date.
+            </li>
+          </TransitionGroup>
+        </div>
+      </template>
       <!-- Normal View -->
       <template v-else>
         <TransitionGroup
@@ -66,6 +118,8 @@
 </template>
 
 <script lang="ts" setup>
+import { Calendar } from "v-calendar";
+import "v-calendar/style.css";
 import type { TodoSaved } from "~/assets/models/todo/todo";
 import type { UpdateJob } from "~/components/part/page/list/ToolsBar.vue";
 import type { Provide as LayoutDefaultProvide } from "~/layouts/default.vue";
@@ -214,6 +268,49 @@ const priorityViewTodos = computed<Record<Priorities, TodoSaved[]>>(() => {
   return { today, tomorrow, thisWeek, nextWeek, upcoming };
 });
 
+// Calendar View
+const calendarContent = computed<{
+  dots: Date[];
+}>(() => {
+  if (query.value.view !== "calendar")
+    return {
+      dots: [],
+    };
+
+  return {
+    dots: todos.value
+      .filter((todo) => todo.dueDate)
+      .map((todo) => new Date(todo.dueDate)),
+  };
+});
+const calendarActiveDate = ref<Date>(new Date());
+const calendarActiveTodos = computed(() => {
+  return todos.value
+    .filter((todo) => {
+      if (!todo.dueDate) return false;
+      const dueDate = new Date(todo.dueDate);
+      return (
+        dueDate.getFullYear() === calendarActiveDate.value.getFullYear() &&
+        dueDate.getMonth() === calendarActiveDate.value.getMonth() &&
+        dueDate.getDate() === calendarActiveDate.value.getDate()
+      );
+    })
+    .toSorted((a, b) => {
+      // By status following 'todo', 'doing', 'done' and due date
+      const statusOrder = ["todo", "doing", "done"];
+      const statusA = statusOrder.indexOf(a.status);
+      const statusB = statusOrder.indexOf(b.status);
+      if (statusA !== statusB) return statusA - statusB;
+      if (a.dueDate && b.dueDate)
+        return Date.parse(a.dueDate) - Date.parse(b.dueDate);
+      return 0;
+    });
+});
+function calendarChangeActiveDate(date: Date) {
+  calendarActiveDate.value = date;
+  revertJobs();
+}
+
 // Query
 const route = useRoute();
 type ListQuery = {
@@ -240,42 +337,69 @@ export type { ListQuery };
 </script>
 
 <style scoped>
-.tag {
-  @apply whitespace-nowrap rounded-full px-2 text-sm;
-}
-.tag--project {
-  @apply bg-blue-500 text-white;
-}
-.tag--label {
-  @apply bg-amber-500 text-white;
-}
-
 /* Normal List */
 .list-move,
 .list-enter-active,
 .list-leave-active {
-  transition: all 0.5s ease;
+  @apply duration-300;
 }
 .list-enter-from,
 .list-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
+  @apply translate-x-[30px] opacity-0;
 }
 .list-leave-active {
-  position: absolute;
+  @apply absolute inset-x-0;
 }
 
 /* List no done */
 .list-no-done-move,
 .list-no-done-enter-active,
 .list-no-done-leave-active {
-  transition: all 0.5s ease;
+  @apply duration-300;
 }
 .list-no-done-enter-from,
 .list-no-done-leave-to {
-  opacity: 0;
+  @apply opacity-0;
 }
 .list-no-done-leave-active {
-  position: absolute;
+  @apply absolute;
+}
+
+/* Calendar */
+:deep(.vc-container) {
+  @apply w-full border-none;
+  * {
+    @apply !duration-300;
+  }
+}
+
+:deep(.vc-primary) {
+  --vc-accent-50: oklch(var(--p) / 0.05);
+  --vc-accent-100: oklch(var(--p) / 0.1);
+  --vc-accent-200: oklch(var(--p) / 0.2);
+  --vc-accent-300: oklch(var(--p) / 0.3);
+  --vc-accent-400: oklch(var(--p));
+  --vc-accent-500: oklch(var(--p));
+  --vc-accent-600: oklch(var(--p));
+  --vc-accent-700: oklch(var(--p));
+  --vc-accent-800: oklch(var(--p));
+  --vc-accent-900: oklch(var(--p));
+
+  --vc-focus-ring: 0 0 0 2px oklch(var(--p) / 0.5);
+  --vc-font-family: var(--font-sans);
+  --vc-weekday-color: oklch(var(--p));
+  --vc-header-arrow-hover-bg: oklch(var(--p) / 0.1);
+}
+:deep(.vc-title),
+:deep(.vc-nav-title),
+:deep(.vc-nav-item) {
+  @apply font-light;
+}
+:deep(.vc-arrow),
+:deep(.vc-nav-arrow) {
+  @apply size-7 rounded-full;
+}
+:deep(.vc-nav-items) {
+  @apply mt-2 gap-2;
 }
 </style>
