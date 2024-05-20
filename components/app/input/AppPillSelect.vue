@@ -1,9 +1,12 @@
 <template>
   <ul class="pills">
     <li
-      v-for="opt in options"
+      v-for="opt in filteredOptions"
       :key="getKey(opt)"
       class="pills__wrapper"
+      :class="{
+        disabled: disabledKeys?.includes(getKey(opt)),
+      }"
     >
       <button
         class="pills__item"
@@ -12,6 +15,12 @@
       >
         {{ getLabel(opt) }}
       </button>
+    </li>
+    <li
+      v-if="filteredOptions.length === 0"
+      class="text-neutral-400"
+    >
+      Nothing to select please create one
     </li>
   </ul>
 </template>
@@ -25,9 +34,19 @@ const props = defineProps<{
   getKey: (option: Option) => string;
   getLabel: (option: Option) => string;
   max?: number;
+  disabledKeys?: string[];
+  hideKeys?: string[];
 }>();
 
+const filteredOptions = computed(() =>
+  props.options.filter((opt) => !props.hideKeys?.includes(props.getKey(opt))),
+);
+
 function select(opt: Option) {
+  if (props.disabledKeys?.includes(props.getKey(opt))) {
+    return;
+  }
+
   if (Array.isArray(modelValue.value)) {
     if (modelValue.value.includes(props.getKey(opt))) {
       modelValue.value = modelValue.value.filter(
@@ -56,11 +75,13 @@ function isActive(opt: Option) {
 
 <style scoped>
 .pills {
-  @apply flex flex-wrap gap-2;
+  @apply flex flex-wrap items-center gap-2;
 }
-.pills__wrapper {
-  @apply flex-1 basis-[70px];
+
+.pills__wrapper.disabled {
+  @apply pointer-events-none opacity-50;
 }
+
 .pills__item {
   @apply w-full whitespace-nowrap rounded-full border border-primary bg-transparent p-2 px-3 text-primary duration-300;
   @apply hover:bg-primary/20;

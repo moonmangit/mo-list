@@ -1,6 +1,9 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: false,
+  app: {
+    pageTransition: { name: "page", mode: "out-in" },
+  },
   runtimeConfig: {
     public: {
       firebase: {
@@ -29,6 +32,7 @@ export default defineNuxtConfig({
       prefix: "part",
     },
   ],
+
   modules: [
     "@nuxtjs/tailwindcss",
     "dayjs-nuxt",

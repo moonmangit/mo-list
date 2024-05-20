@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-primary-content/5">
+  <div class="min-h-screen overflow-x-hidden bg-primary-content/5">
     <!-- Navigator -->
     <section
       class="sticky top-0 z-20 space-y-2 bg-primary p-4 text-primary-content"

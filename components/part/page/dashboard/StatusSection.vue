@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-type Status = "todo" | "doing" | "done";
+type Status = "todo" | "done";
 const statusConfig: Record<
   Status,
   {
@@ -41,10 +41,6 @@ const statusConfig: Record<
   todo: {
     label: "To Do",
     colorClass: "text-red-500",
-  },
-  doing: {
-    label: "Doing",
-    colorClass: "text-emerald-500",
   },
   done: {
     label: "Done",

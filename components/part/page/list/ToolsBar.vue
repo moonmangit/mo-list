@@ -127,33 +127,36 @@
           </button>
         </section>
         <!-- Project -->
-        <template v-if="!query.project">
-          <section>Project</section>
-          <AppPillSelect
-            v-model="form.defineField('projectId')[0].value!"
-            :options="injected?.data.value?.projects || []"
-            :get-key="(p) => p.id"
-            :get-label="(p) => p.name"
-          />
-        </template>
+        <section>Project</section>
+        <AppPillSelect
+          v-model="form.defineField('projectId')[0].value!"
+          :options="injected?.data.value?.projects || []"
+          :get-key="(p) => p.id"
+          :get-label="(p) => p.name"
+          :hide-keys="
+            injected?.data.value?.projects
+              ?.filter((p) => p.id !== query.project)
+              .map((p) => p.id) || []
+          "
+          :disabled-keys="[query.project || '']"
+        />
         <!-- Label -->
-        <template v-if="!query.label">
-          <section>
-            Label
-            <span
-              v-if="form.values.labelIds?.length"
-              class="text-primary-content/50"
-            >
-              ({{ form.values.labelIds.length }} labels)
-            </span>
-          </section>
-          <AppPillSelect
-            v-model="form.defineField('labelIds')[0].value!"
-            :options="injected?.data.value?.labels || []"
-            :get-key="(p) => p.id"
-            :get-label="(p) => p.name"
-          ></AppPillSelect>
-        </template>
+        <section>
+          Label
+          <span
+            v-if="form.values.labelIds?.length"
+            class="text-primary-content/50"
+          >
+            ({{ form.values.labelIds.length }} labels)
+          </span>
+        </section>
+        <AppPillSelect
+          v-model="form.defineField('labelIds')[0].value!"
+          :options="injected?.data.value?.labels || []"
+          :get-key="(p) => p.id"
+          :get-label="(p) => p.name"
+          :disabled-keys="[query.label || '']"
+        ></AppPillSelect>
         <!-- Date -->
         <section>
           Due Date
@@ -220,7 +223,7 @@ const form = useForm({
   initialValues: {
     name: "",
     dueDate: "",
-    labelIds: [],
+    labelIds: props.query.label ? [props.query.label] : [],
     projectId: props.query.project || "",
   },
 });

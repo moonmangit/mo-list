@@ -37,3 +37,14 @@ useHead({
   ],
 });
 </script>
+
+<style>
+.page-enter-active,
+.page-leave-active {
+  @apply duration-300;
+}
+.page-enter-from,
+.page-leave-to {
+  @apply opacity-0;
+}
+</style>

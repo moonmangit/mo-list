@@ -30,6 +30,7 @@
                 />
               </TransitionGroup>
             </ElNameSection>
+            <div class="text-neutral-400">No todo in this section.</div>
           </li>
         </ul>
       </template>
@@ -89,20 +90,28 @@
       </template>
       <!-- Normal View -->
       <template v-else>
-        <TransitionGroup
-          name="list"
-          tag="ul"
-          class="space-y-3"
+        <div class="relative">
+          <TransitionGroup
+            name="list"
+            tag="ul"
+            class="space-y-3"
+          >
+            <ElTodo
+              v-for="todo in filteredTodos"
+              :key="todo.id"
+              :todo="todo"
+              :projects="injected?.data.value?.projects || []"
+              :labels="injected?.data.value?.labels || []"
+              @click="toggleTodoJob(todo.id)"
+            ></ElTodo>
+          </TransitionGroup>
+        </div>
+        <div
+          v-if="filteredTodos.length === 0"
+          class="text-center text-neutral-400"
         >
-          <ElTodo
-            v-for="todo in filteredTodos"
-            :key="todo.id"
-            :todo="todo"
-            :projects="injected?.data.value?.projects || []"
-            :labels="injected?.data.value?.labels || []"
-            @click="toggleTodoJob(todo.id)"
-          ></ElTodo>
-        </TransitionGroup>
+          <p>No todo yet, please create one.</p>
+        </div>
       </template>
     </section>
 
@@ -278,14 +287,14 @@ const calendarContent = computed<{
     };
 
   return {
-    dots: todos.value
+    dots: filteredTodos.value
       .filter((todo) => todo.dueDate)
       .map((todo) => new Date(todo.dueDate)),
   };
 });
 const calendarActiveDate = ref<Date>(new Date());
 const calendarActiveTodos = computed(() => {
-  return todos.value
+  return filteredTodos.value
     .filter((todo) => {
       if (!todo.dueDate) return false;
       const dueDate = new Date(todo.dueDate);
